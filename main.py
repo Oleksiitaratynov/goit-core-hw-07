@@ -37,9 +37,9 @@ class Birthday(Field):
     def __init__(self, value):
         try:
             self.date = datetime.strptime(value, "%d.%m.%Y").date()
-            super().__init__(value)
+            super().__init__(self.date)
         except ValueError:
-            pass
+            raise ValueError("Invalid date format. Use DD.MM.YYYY")
 
 
 class Record:
@@ -119,40 +119,66 @@ def add_contact(args, book: AddressBook):
 
 @input_error
 def change_contact(args, book: AddressBook):
-    pass
+    name, phone = args
+    record = book.find(name)
+    if record:
+        record.edit_phone(record.phones[0].value, phone)
+        return "Phone number changed."
+    else:
+        return "Contact not found."
 
 
 @input_error
 def show_phones(args, book: AddressBook):
-    pass
+    name = args[0]
+    record = book.find(name)
+    if record:
+        return '\n'.join(phone.value for phone in record.phones)
+    else:
+        return "Contact not found."
 
 
 @input_error
 def show_all(book: AddressBook):
-    pass
+    return '\n'.join(str(record) for record in book.data.values())
 
 
 @input_error
 def add_birthday(args, book):
-    # реалізація
-    pass
+    name, birthday = args
+    record = book.find(name)
+    if record:
+        record.add_birthday(birthday)
+        return f"Birthday added for {name}"
+    else:
+        return "Contact not found"
 
 
 @input_error
-def show_birthday(args, book):
-    # реалізація
-    pass
+def show_birthday(args, book: AddressBook):
+    name = args[0]
+    record = book.find(name)
+    if record and record.birthday:
+        return str(record.birthday)
+    else:
+        return "Contact not found or birthday not set."
 
 
 @input_error
-def birthdays(args, book):
-    # реалізація
-    pass
+def birthdays(args, book: AddressBook):
+    days = int(args[0]) if args else 7
+    upcoming_birthdays = []
+    for record in book.data.values():
+        if record.birthday and (0 <= (record.birthday.date - datetime.now().date()).days < days):
+            upcoming_birthdays.append(record.name.value)
+    return '\n'.join(upcoming_birthdays)
 
 
 def parse_input(user_input):
-    # реалізація
-    pass
+    parts = user_input.split()
+    command = parts[0]
+    args = parts[1:]
+    return command, args
 
 
 def main():
