@@ -11,8 +11,12 @@ class Field:
 
 
 class Name(Field):
-    # реалізація класу
-    pass
+    def __init__(self, value):
+        if not isinstance(value, str):
+            raise ValueError("Name must be a string")
+        if not value.strip():
+            raise ValueError("Name cannot be empty")
+        super().__init__(value.strip())
 
 
 class Phone(Field):
@@ -199,28 +203,22 @@ def main():
             print(add_contact(args, book))
 
         elif command == "change":
-            # реалізація
-            pass
+            print(change_contact(args, book))
 
         elif command == "phone":
-            # реалізація
-            pass
+            print(show_phones(args, book))
 
         elif command == "all":
-            # реалізація
-            pass
+            print(show_all(book))
 
         elif command == "add-birthday":
-            # реалізація
-            pass
+            print(add_birthday(args, book))
 
         elif command == "show-birthday":
-            # реалізація
-            pass
+            print(show_birthday(args, book))
 
         elif command == "birthdays":
-            # реалізація
-            pass
+            print(birthdays(args, book))
 
         else:
             print("Invalid command.")
