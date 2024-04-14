@@ -164,8 +164,6 @@ def show_birthday(args, book: AddressBook):
     record = book.find(name)
     if record and record.birthday:
         return str(record.birthday)
-    else:
-        return "Contact not found or birthday not set."
 
 
 @input_error
