@@ -118,22 +118,6 @@ class AddressBook(UserDict):
     def delete(self, name):
         del self.data[name]
 
-    def get_upcoming_birthday(self):
-        congratulation_dates = []
-        today_date = datetime.now()
-        for user in self.data.values():
-            user_date = datetime.strptime(user.birthday.value, "%d.%m.%Y").replace(year=today_date.year)
-            if user_date.date() < today_date.date():
-                user_date = user_date.replace(year=user_date.year + 1)
-            if user_date.weekday() == 5:
-                user_date = user_date.replace(day=user_date.day + 2)
-            if user_date.weekday() == 6:
-                user_date = user_date.replace(day=user_date.day + 1)
-            delta_date = user_date.date() - today_date.date()
-            if delta_date.days <= 7:
-                congratulation_dates.append({user.name.value: user_date.strftime("%d.%m.%Y")})
-        return sorted(congratulation_dates, key=lambda x: str(x.values()))
-
 
 def input_error(func):
     def inner(*args, **kwargs):
