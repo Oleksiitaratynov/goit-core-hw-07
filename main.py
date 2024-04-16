@@ -162,7 +162,7 @@ def show_all(book: AddressBook):
 
 
 @input_error
-def add_birthday(args, book):
+def add_birthday(args, book: AddressBook):
     name, birthday = args
     contact = book.find(name)
     if contact:
@@ -176,7 +176,7 @@ def add_birthday(args, book):
 
 
 @input_error
-def show_birthday(args, book):
+def show_birthday(args, book: AddressBook):
     name, *_ = args
     contact = book.find(name)
     if contact:
@@ -186,7 +186,7 @@ def show_birthday(args, book):
 
 
 @input_error
-def birthdays(args, book):
+def birthdays(args, book: AddressBook):
     upcoming_birthdays = book.get_upcoming_birthdays()
     if upcoming_birthdays:
         return "Upcoming birthdays:\n" + "\n".join(
