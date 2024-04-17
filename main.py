@@ -95,20 +95,32 @@ class AddressBook(UserDict):
     def delete(self, name):
         del self.data[name]
 
-    def get_upcoming_birthdays(self):
+    def find_next_weekday(self, day,weekday: int):
+        days_ahead = weekday - day.weekday()
+        if days_ahead <= 0:
+            days_ahead += 7
+            next_weekday = day + timedelta(days = days_ahead)
+            if next_weekday.weekday() in [5,6]:
+                next_weekday = next_weekday + timedelta(days = (7 - next_weekday.weekday()))
+            return next_weekday
+        
+    def get_upcoming_birthdays(self, days=7):
         upcoming_birthdays = []
-        today = datetime.now()
-        next_week = today + timedelta(days=7)
-
-        for contact in self.data.values():
-            if contact.birthday and contact.birthday.date:
-                contact_birthday = datetime.strptime(contact.birthday.value, "%d.%m.%Y").date()
-                contact_birthday = datetime.combine(contact_birthday, datetime.min.time())
-                contact_birthday = contact_birthday.replace(year=today.year)
-                if today <= contact_birthday <= next_week:
-                    upcoming_birthdays.append(contact)
-                elif next_week < today and contact_birthday.year == today.year + 1:
-                    upcoming_birthdays.append(contact)
+        current_date = datetime.today().date()
+        next_week = current_date + timedelta(weeks=1)
+        for record in self.values():
+            if record.birthday:
+                next_birthday = record.birthday.date.replace(year=current_date.year)
+                if current_date <= next_birthday <= next_week:
+                    if next_birthday.weekday() in [5,6]:
+                        next_birthday = self.find_next_weekday(next_birthday, 0)
+                    upcoming_birthdays.append(f"{record.name.value}: {next_birthday.strftime("%d,%m,%Y")}")
+                elif current_date > next_birthday:
+                    next_birthday = record.birthday.date.replace(year=current_date.year + 1)
+                    if current_date <= next_birthday <= next_week:
+                        if next_birthday.weekday() in [5,6]:
+                            next_birthday = self.find_next_weekday(next_birthday, 0)
+                        upcoming_birthdays.append(f"{record.name.value}: {next_birthday.strftime("%d,%m,%Y")}")
         return upcoming_birthdays
 
 
@@ -189,9 +201,10 @@ def show_birthday(args, book: AddressBook):
 def birthdays(args, book: AddressBook):
     upcoming_birthdays = book.get_upcoming_birthdays()
     if upcoming_birthdays:
-        return "Upcoming birthdays:\n" + "\n".join(
-            [f"{contact.name}: {contact.birthday.value}" for contact in upcoming_birthdays]
-        )
+        return upcoming_birthdays
+    else:
+        return ["No birthdays this week"]
+
 
 def parse_input(user_input):
     parts = user_input.split()
